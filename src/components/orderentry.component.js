@@ -1,23 +1,14 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
-export default class OrderEntry extends Component {
-    constructor(props){
-        super(props)
-    }
-
-    componentDidMount(){
-        //TODO: get dish from backend
-    }
-
-    render() {
+const OrderEntry = ({entry, handleChangeDish}) => {
         return(
             <div className="row">
-                <input className="form-control" type="text" value={this.props.value.dishName}/>
-                <input className="form-control" type="number" value={this.props.value.quantity}/>
-                <input className="form-control" step="0.01" type="number" value={this.props.value.price}/>
+                <input onChange={handleChangeDish} className="form-control" type="text" value={entry.dishName}/>
+                <input onChange={handleChangeDish} className="form-control" type="number" value={entry.quantity}/>
+                <input onChange={handleChangeDish} className="form-control" step="0.01" type="number" value={entry.price}/>
             </div>
         )
-    }
-
 }
+
+export default OrderEntry;
