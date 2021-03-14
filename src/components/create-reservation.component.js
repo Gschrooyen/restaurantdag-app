@@ -8,8 +8,9 @@ export default class CreateReservation extends Component {
         super(props)
 
         this.onChangeInput = this.onChangeInput.bind(this)
-        this.handleChangeDish = this.handleChangeDish.bind(this);
-        this.addDish = this.addDish.bind(this);
+        this.handleChangeDish = this.handleChangeDish.bind(this)
+        this.handleDeleteDish = this.handleDeleteDish.bind(this)
+        this.addDish = this.addDish.bind(this)
 
         this.state = {
             name: '',
@@ -22,7 +23,30 @@ export default class CreateReservation extends Component {
             orders: [
             ],
             payment: 'overschrijving',
-            reservationType: ''
+            reservationType: '',
+            dishes: []
+        }
+    }
+
+    componentDidMount(){
+        fetch('http://localhost:5000/dishes')
+            .then(response => response.json())
+            .then(data => this.setState({
+                dishes: data
+            }))
+    }
+
+    componentDidUpdate(){
+        if(this.state.dishes.length > 0 && this.state.orders.length > 0 && this.state.orders[this.state.orders.length-1].dishName == undefined){
+            const { orders } = this.state
+            let newOrders = orders.slice()
+            let newDish = newOrders[orders.length-1]
+            newDish["dishName"] = this.state.dishes[0].dishName;
+            newDish["price"] = this.state.dishes[0].price;
+            newDish["quantity"] = 1
+            this.setState({
+                orders: newOrders,
+            })
         }
     }
 
@@ -33,10 +57,23 @@ export default class CreateReservation extends Component {
     }
 
     handleChangeDish(e, index) {
-        const { orders } = this.state;
-        let newOrders = orders.slice();
-        let newDish = newOrders[index];
+        const { orders } = this.state
+        let newOrders = orders.slice()
+        let newDish = newOrders[index]
         newDish[e.target.name] = e.target.value;
+        newDish["price"] = this.state.dishes.filter(dish => dish.dishName === newDish.dishName)[0].price
+
+        this.setState({
+            orders: newOrders,
+        })
+    }
+
+    handleDeleteDish(e, index) {
+        e.preventDefault()
+        const { orders } = this.state
+        let newOrders = orders.slice()
+        let newDish = newOrders.splice(index, 1)
+
         this.setState({
             orders: newOrders,
         })
@@ -163,7 +200,7 @@ export default class CreateReservation extends Component {
                         <div className="form-group">
                             <h4>Bestelling: </h4>
                             {orders.map((orderEntry, i) => {
-                                return (<OrderEntry handleChangeDish={(e) => this.handleChangeDish(e, i)} entry={orderEntry} />)
+                                return (<OrderEntry handleChangeDish={(e) => this.handleChangeDish(e, i)} entry={orderEntry} dishes={this.state.dishes} handleDeleteDish={(e) => this.handleDeleteDish(e, i)}/>)
                             })}
                         </div>
                     )}

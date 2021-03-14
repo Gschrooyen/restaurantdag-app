@@ -1,45 +1,20 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
-export default class OrderEntry extends Component {
-    constructor(params){
-        super(params)
-
-        this.state = {
-            dishes = []
-        }
-    }
-    
-    componentDidMount(){
-        fetch('http://localhost:5000/dishes')
-            .then(response => response.json())
-            .then(data => this.setState({
-                dishes: data
-            }))
-    }
-
-    render(){
-        return(
-            <div className="row col-xl-10">
-                <input onChange={this.params.handleChangeDish} className="form-control" name="dishName" type="text" value={this.params.entry.dishName}/>
-                <input onChange={this.params.handleChangeDish} className="form-control" name="quantity" type="number" value={this.params.entry.quantity}/>
-                <input onChange={this.params.handleChangeDish} className="form-control" name="price" step="0.01" type="number" value={this.params.entry.price}/>
-            </div>
-        )
-    }
-}
-
-/*
-const OrderEntry = ({entry, handleChangeDish}) => {
+const OrderEntry = ({entry, handleChangeDish, dishes, handleDeleteDish}) => {
 
         return(
             <div className="row col-xl-10">
-                <input onChange={handleChangeDish} className="form-control" name="dishName" type="text" value={entry.dishName}/>
-                <input onChange={handleChangeDish} className="form-control" name="quantity" type="number" value={entry.quantity}/>
-                <input onChange={handleChangeDish} className="form-control" name="price" step="0.01" type="number" value={entry.price}/>
+                <select onChange={handleChangeDish} className="form-control" name="dishName" value={entry.dishName}>
+                    {dishes.map(dish => {
+                        return(<option key={dish.dishName} value={dish.dishName}>{dish.dishName}</option>)
+                    })}
+                </select>
+                <input onChange={handleChangeDish} className="form-control" name="quantity" step="1" min="0" type="number" value={entry.quantity} required/>
+                <input onChange={handleChangeDish} className="form-control" name="price" step="0.01" type="number" value={entry.price} disabled/>
+                <button onClick={handleDeleteDish} className="form-control">delete</button>
             </div>
         )
 }
 
 export default OrderEntry;
-*/
