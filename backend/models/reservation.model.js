@@ -1,8 +1,12 @@
 const mongoose = require('mongoose')
+const autoIncrement = require('mongoose-auto-increment')
 
 const Schema = mongoose.Schema
 
 const reservationschema = new Schema({
+    reservationNumber:{
+        type: Number
+    },
     name: {
         type: String,
         required: true,
@@ -37,14 +41,23 @@ const reservationschema = new Schema({
         type: String,
         required: true
     },
+    paid:{
+        type: Boolean,
+        default: false,
+        required: true
+    },
     reservationType: {
         type: String,
         required: true
+    },
+    time: {
+        type: String
     }
 }, {
     timestamps: true
 })
 
+reservationschema.plugin(autoIncrement.plugin, {model: 'Reservation', field: 'reservationNumber'})
 const Reservation = mongoose.model('Reservation', reservationschema, 'Reservation')
 
 module.exports = Reservation

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import OrderEntry from './orderentry.component';
-import UserEntry from "./orderentry.component"
 
 export default class CreateReservation extends Component {
     constructor(props) {
@@ -11,6 +10,7 @@ export default class CreateReservation extends Component {
         this.handleChangeDish = this.handleChangeDish.bind(this)
         this.handleDeleteDish = this.handleDeleteDish.bind(this)
         this.addDish = this.addDish.bind(this)
+        this.onSubmit = this.onSubmit.bind(this)
 
         this.state = {
             name: '',
@@ -23,7 +23,9 @@ export default class CreateReservation extends Component {
             orders: [],
             payment: 'overschrijving',
             reservationType: '',
-            dishes: []
+            dishes: [],
+            time:'',
+            paid: false
         }
     }
 
@@ -51,9 +53,15 @@ export default class CreateReservation extends Component {
     }
 
     onChangeInput(e) {
-        this.setState({
-            [e.target.name]: e.target.value
-        })
+        if(e.target.type === "checkbox"){
+            this.setState(initialState => ({
+                [e.target.name]: e.target.checked
+            }))
+        }else{
+            this.setState({
+                [e.target.name]: e.target.value
+            })
+        }
     }
 
     handleChangeDish(e, index) {
@@ -70,7 +78,6 @@ export default class CreateReservation extends Component {
 
     handleDeleteDish(e, index) {
         e.preventDefault()
-        console.log(index)
         const { orders } = this.state
         let newOrders = orders.slice()
         newOrders.splice(index, 1)
@@ -93,14 +100,21 @@ export default class CreateReservation extends Component {
                 appartment: this.state.appartment,
                 remarks: this.state.remarks
             },
-            order: this.state.order,
+            orders: this.state.orders,
             payment: this.state.payment,
-            reservationTytpe: this.state.reservationType
+            reservationType: this.state.reservationType,
+            time: this.state.time
         }
 
-        console.log(reservation)
+        fetch('http://localhost:5000/reservations', {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(reservation)
+        })
 
-        window.location = '/'
+        window.location= '/'
     }
 
     addDish(e){
@@ -112,6 +126,11 @@ export default class CreateReservation extends Component {
 
     render() {
         const { orders } = this.state;
+        const checkStyle = { 
+            transform: 'scale(1.7)',
+            marginTop: '2.6rem',
+            marginLeft: '1.8rem'
+        }
         return (
             <div>
                 <h3>Nieuwe inschrijving</h3>
@@ -196,18 +215,18 @@ export default class CreateReservation extends Component {
                             </div>
                         </div>
                     </div>
-                    <button onClick={this.addDish}>add</button>
+                    <button className="btn btn-success" onClick={this.addDish}>add</button>
                     {orders && orders.length > 0 && (
                         <div className="form-group">
                             <h4>Bestelling: </h4>
                             {orders.map((orderEntry, i) => {
-                                return (<OrderEntry handleChangeDish={(e) => this.handleChangeDish(e, i)} entry={orderEntry} dishes={this.state.dishes} handleDeleteDish={(e) => this.handleDeleteDish(e, i)}/>)
+                                return (<OrderEntry handleChangeDish={(e) => this.handleChangeDish(e, i)} index={i} entry={orderEntry} dishes={this.state.dishes} handleDeleteDish={(e) => this.handleDeleteDish(e, i)}/>)
                             })}
                         </div>
                     )}
                     <div className="form-group">
                         <h4>Betaling:</h4>
-                        <div className="row">
+                        <div className="row col-xl-10">
                             <div className="col col-xl-6">
                                 <label>methode: </label>
                                 <select className="form-control"
@@ -218,6 +237,7 @@ export default class CreateReservation extends Component {
                                     <option key="SALLY" value="cash: Sally">cash: Sally</option>
                                     <option key="JEANINE" value="cash: Jeanine">cash: Jeanine</option>
                                     <option key="ERIC" value="cash: Eric">cash: Eric</option>
+                                    <option key="ATLOCATION" value="op locatie">op locatie</option>
                                 </select>
                             </div>
                             <div className="col col-xl-6">
@@ -228,7 +248,33 @@ export default class CreateReservation extends Component {
                                     onChange={this.onChangeInput}>
                                     <option key="TAKE-OUT" value="afhalen">afhalen</option>
                                     <option key="DELIVERY" value="bezorgen">bezorgen</option>
+                                    <option key="DINE-IN" value="aanwezig">aanwezig</option>
                                 </select>
+                            </div>
+                        </div>
+                        <div className="form-group col-xl-10">
+                            <div className="row">
+                                <div className="col col-xl-6">
+                                    <label>Tijd: </label>
+                                    <select name="time" className="form-control mr-3" onChange={this.onChangeInput} value={this.state.time}>
+                                        <option key="NONE" value="">geen voorkeur</option>
+                                        <option key="11" value="11:00">11:00</option>
+                                        <option key="12" value="12:00">12:00</option>
+                                        <option key="13" value="13:00">13:00</option>
+                                        <option key="16" value="16:00">16:00</option>
+                                        <option key="17" value="17:00">17:00</option>
+                                        <option key="18" value="18:00">18:00</option>
+                                    </select>
+                                </div>
+                                <div class="form-check" style={checkStyle}>
+                                    <input type="checkbox" checked={this.state.paid} onChange={this.onChangeInput} name="paid" class="form-check-input" id="paidCheck"/>
+                                    <label class="form-check-label" for="paidCheck">betaald</label>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col col-5 mt-3">
+                                    <button type="submit" className="btn btn-primary">Toevoegen</button>
+                                </div>
                             </div>
                         </div>
                     </div>

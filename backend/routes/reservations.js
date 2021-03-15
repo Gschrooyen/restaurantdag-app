@@ -48,7 +48,7 @@ function calculatePrice(entries){
 
 function reservationObject(body){
     const name = body.name
-    const entries = body.order
+    const entries = body.orders
     const adress = body.adress
     const payment = body.payment
     const reservationType = body.reservationType

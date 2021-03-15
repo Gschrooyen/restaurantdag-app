@@ -11,7 +11,7 @@ import CreateReservation from "./components/create-reservation.component.js"
 function App() {
   return (
     <Router>
-      <div className="container">
+      <div className="container col-xl-9">
         <Navbar />
         <br/>
         <Route path="/" exact component={ReservationList}/>
