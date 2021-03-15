@@ -20,8 +20,7 @@ export default class CreateReservation extends Component {
             number: '',
             appartment: '',
             remarks: '',
-            orders: [
-            ],
+            orders: [],
             payment: 'overschrijving',
             reservationType: '',
             dishes: []
@@ -32,7 +31,8 @@ export default class CreateReservation extends Component {
         fetch('http://localhost:5000/dishes')
             .then(response => response.json())
             .then(data => this.setState({
-                dishes: data
+                dishes: data,
+                orders: [{}]
             }))
     }
 
@@ -70,9 +70,10 @@ export default class CreateReservation extends Component {
 
     handleDeleteDish(e, index) {
         e.preventDefault()
+        console.log(index)
         const { orders } = this.state
         let newOrders = orders.slice()
-        let newDish = newOrders.splice(index, 1)
+        newOrders.splice(index, 1)
 
         this.setState({
             orders: newOrders,
